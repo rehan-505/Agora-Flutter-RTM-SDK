@@ -78,7 +78,9 @@ void testCases(
           timestamp: eventTimestamp,
         );
 
-        final eventJson = {};
+        final eventJson = {
+          'event': event.toJson(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onLinkStateEvent'] ?? [];
@@ -144,7 +146,9 @@ void testCases(
           timestamp: eventTimestamp,
         );
 
-        final eventJson = {};
+        final eventJson = {
+          'event': event.toJson(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onMessageEvent'] ?? [];
@@ -229,7 +233,9 @@ void testCases(
           timestamp: eventTimestamp,
         );
 
-        final eventJson = {};
+        final eventJson = {
+          'event': event.toJson(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onPresenceEvent'] ?? [];
@@ -287,7 +293,9 @@ void testCases(
           timestamp: eventTimestamp,
         );
 
-        final eventJson = {};
+        final eventJson = {
+          'event': event.toJson(),
+        };
 
         final eventIds = eventIdsMapping['RtmEventHandler_onTopicEvent'] ?? [];
         for (final event in eventIds) {
@@ -344,7 +352,9 @@ void testCases(
           timestamp: eventTimestamp,
         );
 
-        final eventJson = {};
+        final eventJson = {
+          'event': event.toJson(),
+        };
 
         final eventIds = eventIdsMapping['RtmEventHandler_onLockEvent'] ?? [];
         for (final event in eventIds) {
@@ -410,7 +420,9 @@ void testCases(
           timestamp: eventTimestamp,
         );
 
-        final eventJson = {};
+        final eventJson = {
+          'event': event.toJson(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onStorageEvent'] ?? [];
@@ -428,6 +440,69 @@ void testCases(
       }
 
       final eventCalled = await onStorageEventCompleter.future;
+      expect(eventCalled, isTrue);
+
+      {}
+// Delay 500 milliseconds to ensure the  call completed.
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      await rtmClient.release();
+    },
+    timeout: const Timeout(Duration(minutes: 2)),
+  );
+
+  testWidgets(
+    'RtmEventHandler.onTokenEvent',
+    (WidgetTester tester) async {
+      final onTokenEventCompleter = Completer<bool>();
+      final theRtmEventHandler = RtmEventHandler(
+        onTokenEvent: (TokenEvent event) {
+          onTokenEventCompleter.complete(true);
+        },
+      );
+
+      final rtmClient = await _createBindingRtmClient(theRtmEventHandler);
+
+// Delay 500 milliseconds to ensure the  call completed.
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      {
+        RtmTokenEventType eventEventType = RtmTokenEventType.willExpire;
+        List<String> messageChannelsChannels = List.filled(5, "hello");
+        ChannelList affectedResourcesMessageChannels = ChannelList(
+          channels: messageChannelsChannels,
+        );
+        AffectedResources eventAffectedResources = AffectedResources(
+          messageChannels: affectedResourcesMessageChannels,
+        );
+        String eventReason = "hello";
+        int eventTimestamp = 5;
+        TokenEvent event = TokenEvent(
+          eventType: eventEventType,
+          reason: eventReason,
+          affectedResources: eventAffectedResources,
+          timestamp: eventTimestamp,
+        );
+
+        final eventJson = {
+          'event': event.toJson(),
+        };
+
+        final eventIds = eventIdsMapping['RtmEventHandler_onTokenEvent'] ?? [];
+        for (final event in eventIds) {
+          final ret = irisTester().fireEvent(event, params: eventJson);
+          // Delay 200 milliseconds to ensure the callback is called.
+          await Future.delayed(const Duration(milliseconds: 200));
+          // TODO(littlegnal): Most of callbacks on web are not implemented, we're temporarily skip these callbacks at this time.
+          if (kIsWeb && ret) {
+            if (!onTokenEventCompleter.isCompleted) {
+              onTokenEventCompleter.complete(true);
+            }
+          }
+        }
+      }
+
+      final eventCalled = await onTokenEventCompleter.future;
       expect(eventCalled, isTrue);
 
       {}
@@ -461,7 +536,12 @@ void testCases(
         String userId = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'userId': userId,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds = eventIdsMapping['RtmEventHandler_onJoinResult'] ?? [];
         for (final event in eventIds) {
@@ -511,7 +591,12 @@ void testCases(
         String userId = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'userId': userId,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds = eventIdsMapping['RtmEventHandler_onLeaveResult'] ?? [];
         for (final event in eventIds) {
@@ -561,7 +646,12 @@ void testCases(
         String topic = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'topic': topic,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onPublishTopicMessageResult'] ??
@@ -615,7 +705,14 @@ void testCases(
         String meta = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'userId': userId,
+          'topic': topic,
+          'meta': meta,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onJoinTopicResult'] ?? [];
@@ -668,7 +765,14 @@ void testCases(
         String meta = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'userId': userId,
+          'topic': topic,
+          'meta': meta,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onLeaveTopicResult'] ?? [];
@@ -733,7 +837,15 @@ void testCases(
         );
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'userId': userId,
+          'topic': topic,
+          'succeedUsers': succeedUsers.toJson(),
+          'failedUsers': failedUsers.toJson(),
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onSubscribeTopicResult'] ?? [];
@@ -784,7 +896,12 @@ void testCases(
         String topic = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'topic': topic,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onUnsubscribeTopicResult'] ?? [];
@@ -839,7 +956,13 @@ void testCases(
         );
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'topic': topic,
+          'users': users.toJson(),
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onGetSubscribedUserListResult'] ??
@@ -890,7 +1013,11 @@ void testCases(
         RtmConnectionState state = RtmConnectionState.disconnected;
         RtmConnectionChangeReason reason = RtmConnectionChangeReason.connecting;
 
-        final eventJson = {};
+        final eventJson = {
+          'channelName': channelName,
+          'state': state.value(),
+          'reason': reason.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onConnectionStateChanged'] ?? [];
@@ -937,7 +1064,9 @@ void testCases(
       {
         String channelName = "hello";
 
-        final eventJson = {};
+        final eventJson = {
+          'channelName': channelName,
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onTokenPrivilegeWillExpire'] ?? [];
@@ -987,7 +1116,11 @@ void testCases(
         String channelName = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onSubscribeResult'] ?? [];
@@ -1037,7 +1170,11 @@ void testCases(
         String channelName = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onUnsubscribeResult'] ?? [];
@@ -1085,7 +1222,10 @@ void testCases(
         int requestId = 5;
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onPublishResult'] ?? [];
@@ -1133,7 +1273,10 @@ void testCases(
         int requestId = 5;
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds = eventIdsMapping['RtmEventHandler_onLoginResult'] ?? [];
         for (final event in eventIds) {
@@ -1180,7 +1323,10 @@ void testCases(
         int requestId = 5;
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onLogoutResult'] ?? [];
@@ -1231,7 +1377,12 @@ void testCases(
         String channelName = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'serverType': serverType.value(),
+          'channelName': channelName,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onRenewTokenResult'] ?? [];
@@ -1282,7 +1433,12 @@ void testCases(
         RtmChannelType channelType = RtmChannelType.none;
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'channelType': channelType.value(),
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onSetChannelMetadataResult'] ?? [];
@@ -1333,7 +1489,12 @@ void testCases(
         RtmChannelType channelType = RtmChannelType.none;
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'channelType': channelType.value(),
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onUpdateChannelMetadataResult'] ??
@@ -1385,7 +1546,12 @@ void testCases(
         RtmChannelType channelType = RtmChannelType.none;
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'channelType': channelType.value(),
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onRemoveChannelMetadataResult'] ??
@@ -1445,7 +1611,13 @@ void testCases(
         );
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'channelType': channelType.value(),
+          'data': data.toJson(),
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onGetChannelMetadataResult'] ?? [];
@@ -1495,7 +1667,11 @@ void testCases(
         String userId = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'userId': userId,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onSetUserMetadataResult'] ?? [];
@@ -1545,7 +1721,11 @@ void testCases(
         String userId = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'userId': userId,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onUpdateUserMetadataResult'] ?? [];
@@ -1595,7 +1775,11 @@ void testCases(
         String userId = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'userId': userId,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onRemoveUserMetadataResult'] ?? [];
@@ -1653,7 +1837,12 @@ void testCases(
         );
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'userId': userId,
+          'data': data.toJson(),
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onGetUserMetadataResult'] ?? [];
@@ -1703,7 +1892,11 @@ void testCases(
         String userId = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'userId': userId,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onSubscribeUserMetadataResult'] ??
@@ -1754,7 +1947,11 @@ void testCases(
         String userId = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'userId': userId,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds = eventIdsMapping[
                 'RtmEventHandler_onUnsubscribeUserMetadataResult'] ??
@@ -1810,7 +2007,13 @@ void testCases(
         String lockName = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'channelType': channelType.value(),
+          'lockName': lockName,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onSetLockResult'] ?? [];
@@ -1865,7 +2068,13 @@ void testCases(
         String lockName = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'channelType': channelType.value(),
+          'lockName': lockName,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onRemoveLockResult'] ?? [];
@@ -1920,7 +2129,13 @@ void testCases(
         String lockName = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'channelType': channelType.value(),
+          'lockName': lockName,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onReleaseLockResult'] ?? [];
@@ -1977,7 +2192,14 @@ void testCases(
         RtmErrorCode errorCode = RtmErrorCode.ok;
         String errorDetails = "hello";
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'channelType': channelType.value(),
+          'lockName': lockName,
+          'errorCode': errorCode.value(),
+          'errorDetails': errorDetails,
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onAcquireLockResult'] ?? [];
@@ -2032,7 +2254,13 @@ void testCases(
         String lockName = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'channelType': channelType.value(),
+          'lockName': lockName,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onRevokeLockResult'] ?? [];
@@ -2101,7 +2329,14 @@ void testCases(
         int count = 5;
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channelName': channelName,
+          'channelType': channelType.value(),
+          'lockDetailList': lockDetailList,
+          'count': count,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onGetLocksResult'] ?? [];
@@ -2163,7 +2398,13 @@ void testCases(
         String nextPage = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'userStateList': userStateList,
+          'count': count,
+          'nextPage': nextPage,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onWhoNowResult'] ?? [];
@@ -2225,7 +2466,13 @@ void testCases(
         String nextPage = "hello";
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'userStateList': userStateList,
+          'count': count,
+          'nextPage': nextPage,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onGetOnlineUsersResult'] ?? [];
@@ -2286,7 +2533,12 @@ void testCases(
         int count = 5;
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channels': channels,
+          'count': count,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onWhereNowResult'] ?? [];
@@ -2320,8 +2572,8 @@ void testCases(
     (WidgetTester tester) async {
       final onGetUserChannelsResultCompleter = Completer<bool>();
       final theRtmEventHandler = RtmEventHandler(
-        onGetUserChannelsResult: (int requestId, ChannelInfo channels,
-            int count, RtmErrorCode errorCode) {
+        onGetUserChannelsResult:
+            (int requestId, List channels, int count, RtmErrorCode errorCode) {
           onGetUserChannelsResultCompleter.complete(true);
         },
       );
@@ -2333,16 +2585,26 @@ void testCases(
 
       {
         int requestId = 5;
-        RtmChannelType channelsChannelType = RtmChannelType.none;
-        String channelsChannelName = "hello";
-        ChannelInfo channels = ChannelInfo(
-          channelName: channelsChannelName,
-          channelType: channelsChannelType,
-        );
+        final List<ChannelInfo> channels = () {
+          RtmChannelType channelsItemChannelType = RtmChannelType.none;
+          String channelsItemChannelName = "hello";
+          ChannelInfo channelsItem = ChannelInfo(
+            channelName: channelsItemChannelName,
+            channelType: channelsItemChannelType,
+          );
+
+          return List.filled(5, channelsItem);
+        }();
+
         int count = 5;
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'channels': channels,
+          'count': count,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onGetUserChannelsResult'] ?? [];
@@ -2390,7 +2652,10 @@ void testCases(
         int requestId = 5;
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onPresenceSetStateResult'] ?? [];
@@ -2438,7 +2703,10 @@ void testCases(
         int requestId = 5;
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onPresenceRemoveStateResult'] ??
@@ -2494,7 +2762,11 @@ void testCases(
         );
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'state': state.toJson(),
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onPresenceGetStateResult'] ?? [];
@@ -2565,7 +2837,13 @@ void testCases(
         int newStart = 5;
         RtmErrorCode errorCode = RtmErrorCode.ok;
 
-        final eventJson = {};
+        final eventJson = {
+          'requestId': requestId,
+          'messageList': messageList,
+          'count': count,
+          'newStart': newStart,
+          'errorCode': errorCode.value(),
+        };
 
         final eventIds =
             eventIdsMapping['RtmEventHandler_onHistoryGetMessagesResult'] ?? [];

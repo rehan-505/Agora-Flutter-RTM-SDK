@@ -1550,6 +1550,15 @@ class MockRtmResultHandlerImpl extends _i1.Mock
       );
 
   @override
+  void onTokenEvent(_i11.TokenEvent? event) => super.noSuchMethod(
+        Invocation.method(
+          #onTokenEvent,
+          [event],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
   void onTokenPrivilegeWillExpire(String? channelName) => super.noSuchMethod(
         Invocation.method(
           #onTokenPrivilegeWillExpire,
@@ -2258,7 +2267,7 @@ class MockRtmResultHandlerImpl extends _i1.Mock
   @override
   void onGetUserChannelsResult(
     int? requestId,
-    _i12.ChannelInfo? channels,
+    List<_i12.ChannelInfo>? channels,
     int? count,
     _i12.RtmErrorCode? errorCode,
   ) =>
